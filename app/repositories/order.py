@@ -32,9 +32,7 @@ class RepositoryOrder(RepositoryBase[Order]):
         **kwargs
     ):
         options = self._get_query_options(load_items_with_products)
-        
-        print(kwargs)
-        
+                
         return await super().list(
             *args, 
             limit=limit, 

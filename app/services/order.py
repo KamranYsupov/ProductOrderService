@@ -63,7 +63,7 @@ class OrderService(CRUDServiceMixin):
         order_data['id'] = uuid.uuid4()
         items_schemas = order_data.pop('items')
         
-        products_ids = [item.product_id for item in items_schemas]
+        products_ids = [uuid.UUID(item.product_id) for item in items_schemas]
         products = await self._repository_product.get_products_by_ids(
             ids=products_ids
         )
@@ -85,6 +85,9 @@ class OrderService(CRUDServiceMixin):
                 
             products[index].quantity = updated_quantity
             item.order_id = order_data['id']
+            
+            if isinstance(item.product_id, str):
+                item.product_id = uuid.UUID(item.product_id)
         
         order = await self._repository_order.create(order_data)
         await self._repository_order_item.bulk_create(items_schemas)

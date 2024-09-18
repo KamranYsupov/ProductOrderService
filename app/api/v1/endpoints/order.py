@@ -11,6 +11,7 @@ from app.schemas.product import ProductSchema
 from app.schemas.order import (
     OrderSchema,
     CreateOrderSchema,
+    OrderStatusSchema,
 )
 from app.schemas.order_item import (
     OrderItemSchema,
@@ -102,15 +103,14 @@ async def create_order(
 @inject
 async def update_order_status(
     order_id: str,
-    status: OrderStatus, 
+    status: OrderStatusSchema, 
     order_service: OrderService = Depends(
         Provide[Container.order_service]
     ),
 ) -> dict[str, str]:
-    status_data = {'status': status}
     order = await order_service.update(
         obj_id=UUID(order_id),
-        obj_in=status_data
+        obj_in=status.model_dump(),
     )    
     
     return {'message': 'Статус успешно обновлен'}

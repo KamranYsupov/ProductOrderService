@@ -1,5 +1,8 @@
-﻿from pydantic import Field
+﻿from pydantic import Field, PostgresDsn
 from pydantic_settings import BaseSettings
+
+
+TEST_MODE = True # если не поставить True, то тесты не будут запускаться
 
 
 class Settings(BaseSettings):
@@ -8,7 +11,6 @@ class Settings(BaseSettings):
     project_name: str = Field(title='Название проекта')
     api_v1_prefix: str = Field(title='Префикс первой версии API', default='/api/v1')
     base_url: str = Field(default='http://127.0.0.1:8000')
-    test_mode: bool = Field(default=False)
 
     # region Настройки БД
     db_user: str = Field(title='Пользователь БД')
@@ -24,11 +26,6 @@ class Settings(BaseSettings):
             'fk': 'fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s',
             'pk': 'pk_%(table_name)s'
         })
-
-    sqlite_default_url: str = Field(
-        default='sqlite+aiosqlite:///./db.sqlite3'
-    )
-
     # endregion
 
     container_wiring_modules: list = Field(
@@ -39,12 +36,31 @@ class Settings(BaseSettings):
         ]
     )
 
+    
+    database_url: str = Field(
+        title='Ссылка БД',
+        default='sqlite+aiosqlite:///./db.sqlite3' if not TEST_MODE\
+            else 'sqlite+aiosqlite:///./test.sqlite3'
+    )
+
     @property
-    def db_url(self) -> str:
-        return self.sqlite_default_url
+    def db_url(self) -> PostgresDsn:
+        if self.database_url:
+            return self.database_url
+        return PostgresDsn.build(
+            scheme='postgresql',
+            username=self.db_user,
+            password=self.db_password,
+            host=self.db_host,
+            port=self.db_port,
+            path=f'{self.db_name}',
+        )
 
     class Config:
-        env_file = '.env'
+        if TEST_MODE:
+            env_file = '.test.env'
+        else:
+            env_file = '.env'
 
 
 settings = Settings()

@@ -10,18 +10,20 @@ from app.utils.enums import OrderStatus
 from .order_item import OrderItemSchema, CreateOrderItemSchema
     
     
-class OrderBaseSchema(BaseModel):
+class OrderStatusSchema(BaseModel):
     status: OrderStatus = OrderStatus.IN_PROGRESS
     
 
-class OrderSchema(OrderBaseSchema):
+class OrderSchema(OrderStatusSchema):
     id: UUID
     items: Optional[List[OrderItemSchema]] = None
     
     
-class CreateOrderSchema(OrderBaseSchema):
+class CreateOrderSchema(OrderStatusSchema):
     items: List[CreateOrderItemSchema] 
     
+    
+
      
 
     

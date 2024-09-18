@@ -16,13 +16,16 @@ from app.db import (
     OrderItem,
 )
 
-from app.core.config import settings
+from app.core import config
 
 
 
 
 class Container(containers.DeclarativeContainer):
-    db_manager = providers.Singleton(DataBaseManager, db_url=settings.db_url)
+    db_manager = providers.Singleton(
+        DataBaseManager, 
+        db_url=config.settings.db_url
+    )
     session = providers.Resource(db_manager().get_async_session)
 
     # region repository
@@ -52,5 +55,9 @@ class Container(containers.DeclarativeContainer):
 
 
 container = Container()
-container.init_resources()
-container.wire(modules=settings.container_wiring_modules)
+container.wire(modules=config.settings.container_wiring_modules)
+
+if not config.TEST_MODE:
+    container.init_resources()
+
+    

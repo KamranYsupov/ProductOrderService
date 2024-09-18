@@ -25,13 +25,12 @@ router = APIRouter(tags=['Product'], prefix='/products')
 )
 @inject
 async def get_product(
-    product_id: str,
+    product_id: UUID,
     product_service: ProductService = Depends(
         Provide[Container.product_service]
     ),
 ) -> ProductSchema:
-
-    product = await product_service.get(id=UUID(product_id))
+    product = await product_service.get(id=product_id)
     product_schema = product.serialize(
         schema_class=ProductSchema,
         model_dump=False,
@@ -53,7 +52,7 @@ async def get_products(
     ),
 ) -> List[ProductSchema]:
 
-    products =  await product_service.list(limit=limit, skip=skip)
+    products = await product_service.list(limit=limit, skip=skip)
     products_schemas = [
         product.serialize(
             schema_class=ProductSchema,

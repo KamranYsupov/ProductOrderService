@@ -28,17 +28,21 @@ class CRUDServiceMixin:
         self.unique_fields = unique_fields
 
     async def get(self, **kwargs) -> ModelType:
-        return await self._repository.get(**kwargs)
+        obj = await self._repository.get(**kwargs)
+        if not obj:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+            
+        return obj
 
     async def create(
         self, 
         obj_in,
-        commit: bool = True,
     ) -> ModelType:
         insert_data = await self.validate_object_insertion(obj_in)
         return await self._repository.create(
             insert_data=insert_data,
-            commit=commit,
         )
 
     async def update(
@@ -46,13 +50,11 @@ class CRUDServiceMixin:
         *, 
         obj_id: UUID,
         obj_in,
-        commit: bool = True,
     ) -> ModelType:
         insert_data = await self.validate_object_insertion(obj_in)
         return await self._repository.update(
             obj_id=obj_id,
             insert_data=insert_data,
-            commit=commit,
         )
 
     async def list(
