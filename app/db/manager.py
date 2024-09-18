@@ -20,7 +20,7 @@ class DataBaseManager:
             class_=AsyncSession,
             autoflush=False,
             autocommit=False,
-            expire_on_commit=True,
+            expire_on_commit=False,
         )
 
     async def get_async_session(self) -> AsyncGenerator[AsyncSession, None]:

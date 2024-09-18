@@ -5,6 +5,8 @@ from typing import (
     TypeVar, 
     Type, 
     Optional,
+    Union, 
+    Sequence
 )
 
 from fastapi import HTTPException
@@ -20,7 +22,7 @@ class CRUDServiceMixin:
     def __init__(
         self, 
         repository: Type[Repository],
-        unique_fields: List[str] | Tuple[str] | None = None,
+        unique_fields: Union[Sequence[str], None] = None,
     ):
         self._repository = repository
         self.unique_fields = unique_fields
@@ -28,24 +30,47 @@ class CRUDServiceMixin:
     async def get(self, **kwargs) -> ModelType:
         return await self._repository.get(**kwargs)
 
-    async def create(self, obj_in) -> ModelType:
+    async def create(
+        self, 
+        obj_in,
+        commit: bool = True,
+    ) -> ModelType:
         insert_data = await self.validate_object_insertion(obj_in)
         return await self._repository.create(
             insert_data=insert_data,
+            commit=commit,
         )
 
-    async def update(self, *, obj_id: UUID, obj_in) -> ModelType:
+    async def update(
+        self, 
+        *, 
+        obj_id: UUID,
+        obj_in,
+        commit: bool = True,
+    ) -> ModelType:
         insert_data = await self.validate_object_insertion(obj_in)
         return await self._repository.update(
             obj_id=obj_id,
             insert_data=insert_data,
+            commit=commit,
         )
 
-    async def list(self, *args, limit: int, **kwargs) -> list[ModelType]:
-        return await self._repository.list(*args, limit=limit, **kwargs)
+    async def list(
+        self, 
+        *args,
+        limit: Optional[int] = None,
+        skip: Optional[int] = None,
+        **kwargs
+    ) -> List[ModelType]:
+        return await self._repository.list(
+            *args,
+            limit=limit,
+            skip=skip,
+            **kwargs
+        )
 
-    async def delete(self, obj_id: UUID) -> None:
-        return await self._repository.delete(obj_id=obj_id)
+    async def delete(self, *args, **kwargs) -> None:
+        return await self._repository.delete(*args, **kwargs)
 
     async def exists(self, *args, **kwargs) -> Optional[ModelType]:
         return await self._repository.exists(*args, **kwargs)

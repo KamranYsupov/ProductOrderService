@@ -1,9 +1,9 @@
 from dependency_injector import containers, providers
 
 from app.repositories import (
-    RespositoryProduct,
-    RespositoryOrder,
-    RespositoryOrderItem
+    RepositoryProduct,
+    RepositoryOrder,
+    RepositoryOrderItem
 )
 from app.services import (
     ProductService,
@@ -30,10 +30,10 @@ class Container(containers.DeclarativeContainer):
         RepositoryProduct, model=Product, session=session
     )
     repository_order = providers.Singleton(
-        RespositoryOrder, model=Order, session=session
+        RepositoryOrder, model=Order, session=session
     )
     repository_order_item = providers.Singleton(
-        RespositoryOrderItem, model=OrderItem, session=session
+        RepositoryOrderItem, model=OrderItem, session=session
     )
     # endregion
 
@@ -44,6 +44,7 @@ class Container(containers.DeclarativeContainer):
     )
     order_service = providers.Singleton(
         OrderService,
+        repository_product=repository_product,
         repository_order=repository_order,
         repository_order_item=repository_order_item,
     )

@@ -2,22 +2,19 @@ from typing import Optional
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import ORJSONResponse
 from dependency_injector.wiring import Provide, inject
 
 from app.core.config import settings
 from app.core.container import Container, container
 from app.api.v1 import routers
-from app.db import DataBaseManager
+from app.db import DataBaseManager, db_manager
 
 @asynccontextmanager
 @inject
 async def lifespan(
     fastapi_app: FastAPI,
-    db_manager: DataBaseManager = Provide[
-        Container.db_manager
-    ]
 ):
 
     yield

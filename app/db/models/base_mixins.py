@@ -1,6 +1,6 @@
 ﻿import uuid
 import copy
-from typing import Dict, List, Tuple
+from typing import Dict, Sequence
 from datetime import datetime
 
 from sqlalchemy import func, MetaData
@@ -29,7 +29,8 @@ class Base(DeclarativeBase):
     def serialize(
         self, 
         schema_class,
-        exclude_fields: List[str | None] | Tuple[str | None] = [],
+        exclude_fields: Sequence[str] = [],
+        model_dump: bool = True,
     ) -> Dict:
         serialized_data = {}
         schema_fields = schema_class.model_fields.keys()
@@ -43,8 +44,11 @@ class Base(DeclarativeBase):
        
         for field in exclude_fields: 
             serialized_data.pop(field)
-
-        return serialized_data
+            
+        if model_dump:
+            return serialized_data
+            
+        return schema_class(**serialized_data)
 
 
 class TimestampedMixin:

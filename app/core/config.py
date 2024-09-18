@@ -26,7 +26,7 @@ class Settings(BaseSettings):
         })
 
     sqlite_default_url: str = Field(
-        default='sqlite+aiosqlite:///./db_test.sqlite3'
+        default='sqlite+aiosqlite:///./db.sqlite3'
     )
 
     # endregion
@@ -34,7 +34,8 @@ class Settings(BaseSettings):
     container_wiring_modules: list = Field(
         title='Модули контейнера',
         default=[
-            'app.api.v1.endpoints'
+            'app.api.v1.endpoints.product',
+            'app.api.v1.endpoints.order'
         ]
     )
 
